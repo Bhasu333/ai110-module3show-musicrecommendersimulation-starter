@@ -2,110 +2,73 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeFinder 1.0**
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+This recommender generates personalized song suggestions by scoring and ranking track attributes against a user's stated taste profile. 
+- **Recommendations**: Generates a sorted list of the top `k` matching songs.
+- **Assumptions**: Assumes users can accurately state their favorite genre, mood, target energy (on a 0.0 to 1.0 scale), and whether they prefer acoustic sounds.
+- **Audience**: Designed for classroom exploration and basic algorithmic simulation.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
-
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+VibeFinder uses a content-based filtering approach:
+- **Song Features**: Genre, mood, energy level (0.0 to 1.0), and acousticness (0.0 to 1.0).
+- **Taste Preferences**: Favorite genre, favorite mood, target energy, and a yes/no preference for acoustic music.
+- **Scoring**: It computes a final score out of 8.0 max. Matching the genre exactly is worth 3.0 points. Matching the mood is worth 2.0 points. The energy score (up to 2.0 points) is calculated based on how close the song's energy is to the target. Acousticness matches are worth 1.0 point (adding acousticness for acoustic fans, and subtracting it for non-acoustic fans).
+- **Starter Logic Changes**: We expanded the algorithm to support acousticness preferences and added structured text explanations explaining the exact points breakdown.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+- **Catalog Size**: 20 songs.
+- **Represented Genres & Moods**: Pop, lofi, rock, ambient, jazz, synthwave, hip-hop, and edm. Moods include happy, chill, intense, relaxed, moody, and focused.
+- **Data Changes**: We expanded the starter CSV from 10 songs to 20 songs to test cross-genre matching and profile behaviors under a larger set.
+- **Missing Elements**: Missing lyrics, sub-genres, release year, artist fame/reputation, and cultural context.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+- **Capturing Niche Vibes**: Works really well for users with clear, high-contrast tastes, like a chill lofi fan or an intense EDM lover.
+- **Intuitive Scoring**: The proximity calculation for energy works great, correctly ranking tracks that match the user's intensity levels even if the genre differs.
 
 ---
 
-## 6. Limitations and Bias 
+## 6. Limitations and Bias  
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+- **Missing Features**: Does not consider tempo, valence (happiness), or song length.
+- **Underrepresented Categories**: Classical, metal, and country are completely missing from the dataset.
+- **Genre Overfitting**: Because genre is weighted heavily (3.0 out of 8.0), a user is highly likely to only get songs of their favorite genre, forming a filter bubble.
+- **Popularity/Feedback Loops**: Since there is no user feedback loop (e.g., skips or likes), the recommendations are completely static.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+We tested the recommender using three distinct user profiles:
+1. **EDM Fan**: (edm, intense, 0.9 energy, non-acoustic) -> Recommended high-energy, low-acousticness EDM tracks (`Techno Pulse`, `Electric Horizon`).
+2. **Chill Lofi Listener**: (lofi, chill, 0.35 energy, acoustic) -> Successfully recommended lofi, low-energy, acoustic-heavy tracks (`Library Rain`, `Midnight Coding`).
+3. **Synthwave/Rock Enthusiast**: (synthwave, moody, 0.75 energy, non-acoustic) -> Correctly recommended synthwave tracks (`Night Drive Loop`, `Neon Samurai`).
 
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+The scoring matched our intuition, showing that high-energy preferences properly filtered out ambient tracks.
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+- **Tempo and Valence**: Incorporate tempo_bpm and valence into the weighted similarity score.
+- **Diversity Penalty**: Introduce a penalty for returning too many songs from the same artist or genre, forcing the list to be more diverse.
+- **Dynamic Feedback**: Keep track of user skips and adjust the profile weights over time.
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+I learned that content-based recommenders are simple to build but suffer from lack of diversity. It was interesting to see how small tweaks in weights drastically change what gets suggested. This assignment changed how I think about apps like Spotify. I now see how easy it is to get trapped in a "filter bubble" if an algorithm focuses too heavily on matching metadata rather than exploring collaborative user behavior.
